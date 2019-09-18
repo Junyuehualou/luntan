@@ -1,0 +1,22 @@
+{% extends 'front/front_base.html' %}
+
+{% block title %}
+    文章详情页
+{% endblock %}
+
+
+{% block script %}
+    <script type="text/javascript" src="{{ url_for('static', filename='front/js/detail.js') }}"></script>
+{% endblock %}
+
+
+{% block content %}
+    <div class="detail_con fl">
+        <h3>{{ news.title }}</h3>
+        <div class="detail_about clearfix">
+            <span class="time_souce fl">{{ news.send_time }} 来源: {{ news.source }}</span>
+{#            <span class="comment fr">{{ data.news.comments_count }}</span>#}
+        </div>
+        {{ news.content | safe }}
+    </div>
+{% endblock %}
