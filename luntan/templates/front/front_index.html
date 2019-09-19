@@ -69,6 +69,23 @@
 
 
 
+        {% for new in news_list %}
+
+        <li>
+            <a href="#" class="news_pic fl"><img src="{{ url_for('static', filename='front/images/news_pic.jpg') }}"></a>
+            <a href="#" class="news_title fl">{{ new.title }}</a>
+            <a href="#" class="news_detail fl">{{ new.digest }}</a>
+            <div class="author_info fl">
+                <div class="source fl">
+                    来源：{{ new.source }}
+                </div>
+                <div class="time fl">{{ new.send_time }}</div>
+            </div>
+        </li>
+
+        {% endfor %}
+
+
     </ul>
 {% endblock %}
 

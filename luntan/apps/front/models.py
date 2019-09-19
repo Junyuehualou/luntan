@@ -3,6 +3,7 @@ from datetime import datetime
 
 
 class News(db.Model):
+    __tablename__ = "news"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.Text, nullable=False)
     content = db.Column(db.Text, nullable=False)

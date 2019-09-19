@@ -112,27 +112,27 @@ def write_news():
             new = News(title=title, content=content, author="Junyue", digest=digest, source="东湖日报")
             db.session.add(new)
             db.session.commit()
-            message = "提交成功"
-            time = datetime.now()
-            send_time = time.strftime("%Y-%m-%d %H:%M:%S")
-            data = {
-                "title": title,
-                "category_id": category_id,
-                "digest": digest,
-                "content": content,
-                "author": "Junyue",
-                "source": "东湖日报",
-                "send_time": send_time
-            }
-            flag = 1
-            news_info = []
-            # 将前端提交的新闻渲染到页面
-            if flag:
-                news_info.append(data)
-                return render_template('front/front_index.html', news_info=news_info)
-            else:
-                return render_template('front/news_editor.html', message=message)
+            message = "<script>alert('新闻提交成功')</script>"
+            return render_template("front/news_editor.html", message=message)
         else:
-            return redirect(url_for('cms.profile'))
+            message = "<script>alert('新闻提交失败')</script>"
+            return render_template("front/news_editor.html", message=message)
 
 
+# 将数据从数据库查出来，渲染到页面    每次加载新闻页
+@bp.route('/load_news/', endpoint="load_news")
+def load_news():
+    all_news = News.query.order_by(News.id.desc()).all()
+    news_list = []
+    for new in all_news:
+        news_info = {}
+        news_info["id"] = new.id
+        news_info["title"] = new.title
+        news_info["content"] = new.content
+        news_info["author"] = new.author
+        news_info["source"] = new.source
+        news_info["send_time"] = new.send_time
+        news_info["digest"] = new.digest
+        news_list.append(news_info)
+    # print(news_list)
+    return render_template("front/front_index.html", news_list=news_list)

@@ -54,13 +54,22 @@
         </div>
         <input type="hidden" name="news_id" value="">
         <div class="form_group indent_group line_top">
-            <input name="submit" type="submit" value="确定" class="confirm" >
-            <input type="button" value="取消" class="cancel" onclick="cancel()">
+            <input name="submit" type="submit" value="提交保存" class="confirm" >
+            <input type="button" value="取消保存" class="cancel" onclick="cancel()">
+            <a href="{{ url_for('cms.profile') }}" class="confirm">返回首页</a>
         </div>
     </form>
 </div>
-{% if message %}
-    {{ message }}
-{% endif %}
+
+    {% if message %}
+        {{ message|safe }}
+    {% endif %}
+
+        <script type="text/javascript">
+            function cancel() {
+                location.reload("news_editor.html")
+            }
+
+        </script>
 </body>
 </html>
