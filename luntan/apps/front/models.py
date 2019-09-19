@@ -9,3 +9,4 @@ class News(db.Model):
     author = db.Column(db.String(50))
     source = db.Column(db.String(100))
     send_time = db.Column(db.DateTime, default=datetime.now)
+    digest = db.Column(db.Text, nullable=False)

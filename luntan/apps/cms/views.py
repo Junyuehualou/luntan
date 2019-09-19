@@ -1,9 +1,12 @@
 from flask import Blueprint, render_template, views, request, session, redirect, url_for, g, flash
-from .forms import LoginForm, ChangeSecret
+from .forms import LoginForm, ChangeSecret, NewsWrite
 from .models import CMSUser
+from ..front.models import News
 import config
 from .decorators import login_required
 from exts import db
+from datetime import datetime
+import time
 
 
 bp = Blueprint('cms', __name__, url_prefix="/cms")
@@ -87,14 +90,49 @@ bp.add_url_rule('/change/',view_func=ChangeView.as_view('change'))
 
 
 # 转到新闻版块
-@bp.route('/news/')
+@bp.route('/news/', endpoint="news")
 @login_required
 def news():
     return render_template('front/front_index.html')
 
 
-# 写新闻
-@bp.route('/write/')
+# 写新闻  并将信息渲染到新闻版块
+@bp.route('/write/', methods=["POST", "GET"])
 @login_required
 def write_news():
-    return render_template('front/news_editor.html')
+    if request.method == "GET":
+        return render_template('front/news_editor.html')
+    else:
+        form = NewsWrite(request.form)
+        if form.validate():
+            title = form.title.data
+            category_id = form.category_id.data
+            digest = form.digest.data
+            content = form.content.data
+            new = News(title=title, content=content, author="Junyue", digest=digest, source="东湖日报")
+            db.session.add(new)
+            db.session.commit()
+            message = "提交成功"
+            time = datetime.now()
+            send_time = time.strftime("%Y-%m-%d %H:%M:%S")
+            data = {
+                "title": title,
+                "category_id": category_id,
+                "digest": digest,
+                "content": content,
+                "author": "Junyue",
+                "source": "东湖日报",
+                "send_time": send_time
+            }
+            flag = 1
+            news_info = []
+            # 将前端提交的新闻渲染到页面
+            if flag:
+                news_info.append(data)
+                return render_template('front/front_index.html', news_info=news_info)
+            else:
+                return render_template('front/news_editor.html', message=message)
+        else:
+            return redirect(url_for('cms.profile'))
+
+

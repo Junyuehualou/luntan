@@ -23,3 +23,5 @@ def detail(page):
         return render_template('front/404.html')
 
 
+
+
