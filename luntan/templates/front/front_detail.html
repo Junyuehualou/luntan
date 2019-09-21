@@ -11,12 +11,36 @@
 
 
 {% block content %}
-    <div class="detail_con fl">
-        <h3>{{ news.title }}</h3>
+    <div class="detail_con fl" style="width: 1000px">
+        <h3>{{ new_info.title }}</h3>
         <div class="detail_about clearfix">
-            <span class="time_souce fl">{{ news.send_time }} 来源: {{ news.source }}</span>
-{#            <span class="comment fr">{{ data.news.comments_count }}</span>#}
+            <span class="time_souce fl">{{ new_info.send_time }} 来源: {{ new_info.source }}</span>
+
         </div>
-        {{ news.content | safe }}
+        {{ new_info.content | safe }}
     </div>
+
+    <div><input type="text"></div>
+
+
+
+
+
+    <form action="" class="comment_form" >
+         <div class="person_pic">
+             <img src="{{ url_for('static', filename='front/images/cat.jpg') }}" alt="用户图标">
+         </div>
+
+        <div>
+            <textarea placeholder="请发表您的评论" class="comment_input"></textarea>
+            <input type="submit" name="" value="评 论" class="comment_sub">
+        </div>
+    </form>
+
+
+
 {% endblock %}
+
+
+
+

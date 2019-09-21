@@ -50,39 +50,23 @@
         </li>
 
 
-        {% for data in news_info %}
-            {% if data %}
-        <li>
-            <a href="#" class="news_pic fl"><img src="{{ url_for('static', filename='front/images/news_pic.jpg') }}"></a>
-            <a href="#" class="news_title fl">{{ data.title }}</a>
-            <a href="#" class="news_detail fl">{{ data.digest }}</a>
-            <div class="author_info fl">
-                <div class="source fl">
-                    来源：{{ data.source }}
-                </div>
-                <div class="time fl">{{ data.send_time }}</div>
-            </div>
-        </li>
-            {% endif %}
-        {% endfor %}
-
-
-
 
         {% for new in news_list %}
+            <form action="" method="post">
 
         <li>
             <a href="#" class="news_pic fl"><img src="{{ url_for('static', filename='front/images/news_pic.jpg') }}"></a>
-            <a href="#" class="news_title fl">{{ new.title }}</a>
+            <a href="{{ url_for('cms.news_detail' ,new_id=new.id  ) }}" class="news_title fl">{{ new.title }}</a>
             <a href="#" class="news_detail fl">{{ new.digest }}</a>
             <div class="author_info fl">
                 <div class="source fl">
                     来源：{{ new.source }}
                 </div>
                 <div class="time fl">{{ new.send_time }}</div>
+
             </div>
         </li>
-
+            </form>
         {% endfor %}
 
 

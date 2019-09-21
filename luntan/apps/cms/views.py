@@ -1,5 +1,5 @@
-from flask import Blueprint, render_template, views, request, session, redirect, url_for, g, flash
-from .forms import LoginForm, ChangeSecret, NewsWrite
+from flask import Blueprint, render_template, views, request, session, redirect, url_for, g, flash, Response
+from .forms import LoginForm, ChangeSecret, NewsWrite, Register
 from .models import CMSUser
 from ..front.models import News
 import config
@@ -61,6 +61,23 @@ class LoginView(views.MethodView):
 bp.add_url_rule("/login/", view_func=LoginView.as_view("login"))
 
 
+# 用户注册
+@bp.route('/register/', endpoint='register', methods=["POST", "GET"])
+def register():
+    if request.method == "POST":
+        form = Register(request.form)
+        if form.validate():
+            username = form.username.data
+            email = form.email.data
+            password = form.password.data
+            user = CMSUser(username=username, email=email, password=password)
+            db.session.add(user)
+            db.session.commit()
+        return render_template('cms/cms_login.html', register_info="<script>alert('注册成功')</script>")
+    else:
+        return render_template('cms/cms_register.html')
+
+
 # 更换密码
 class ChangeView(views.MethodView):
     def get(self):
@@ -115,7 +132,7 @@ def write_news():
             message = "<script>alert('新闻提交成功')</script>"
             return render_template("front/news_editor.html", message=message)
         else:
-            message = "<script>alert('新闻提交失败')</script>"
+            message = "<script>alert('新闻内容填写不完整，提交失败')</script>"
             return render_template("front/news_editor.html", message=message)
 
 
@@ -136,3 +153,11 @@ def load_news():
         news_list.append(news_info)
     # print(news_list)
     return render_template("front/front_index.html", news_list=news_list)
+
+
+# 跳转到详情页
+@bp.route("/news_detail/<new_id>/")
+def news_detail(new_id):
+    new_info = News.query.filter_by(id=new_id).first()
+    print(new_info.content)
+    return render_template("front/front_detail.html", new_info=new_info)
