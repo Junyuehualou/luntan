@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, views, request, session, redirect, url_for, g, flash, Response
-from .forms import LoginForm, ChangeSecret, NewsWrite, Register
+from .forms import LoginForm, ChangeSecret, NewsWrite, Register, ChangEmail
 from .models import CMSUser
 from ..front.models import News
 import config
@@ -73,7 +73,8 @@ def register():
             user = CMSUser(username=username, email=email, password=password)
             db.session.add(user)
             db.session.commit()
-        return render_template('cms/cms_login.html', register_info="<script>alert('注册成功')</script>")
+        # return render_template('cms/cms_login.html', register_info="<script>alert('注册成功')</script>")
+            return redirect(url_for('cms.login'))
     else:
         return render_template('cms/cms_register.html')
 
@@ -104,6 +105,34 @@ class ChangeView(views.MethodView):
 
 
 bp.add_url_rule('/change/',view_func=ChangeView.as_view('change'))
+
+#更改邮箱
+class ChangeEmail(views.MethodView):
+    def get(self):
+        return render_template('cms/cms_change_email.html')
+
+    def post(self):
+        print("开始")
+        form = ChangEmail(request.form)
+        if form.validate():
+            old_email = form.old_email.data
+            email_repeat = form.email_repeat.data
+            user = CMSUser.query.filter_by(email=old_email).first()
+            if user:
+                user.email = email_repeat
+                db.session.commit()
+                flash("邮箱更改成功， 请重新登录")
+                return redirect(url_for('cms.login'))
+            else:
+                flash("修改邮箱失败,重新输入")
+                return render_template('cms/cms_change_email.html')
+        else:
+            flash("修改邮箱失败")
+            return render_template('cms/cms_change_email.html')
+
+
+bp.add_url_rule('/change_email/',view_func=ChangeEmail.as_view('change_email'))
+
 
 
 # 转到新闻版块

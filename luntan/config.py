@@ -3,10 +3,10 @@ import os
 SECRET_KEY = os.urandom(24)
 
 HOSTNAME = '127.0.0.1'
-PORT = '3306'
-DATABASE = 'luntan'
+PORT = 3306
+DATABASE = 'jianshu'
 USERNAME = 'root'
-PASSWORD = '1257119513'
+PASSWORD = '123456'
 
 DB_UI = "mysql+pymysql://{username}:{password}@{host}:{port}/{db}?charset=utf8".format(username=USERNAME,password=PASSWORD,host=HOSTNAME,port=PORT,db=DATABASE)
 

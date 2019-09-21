@@ -41,7 +41,13 @@ def change_secret(password, new_password):
     db.session.commit()
     print("密码修改成功")
 
-
+@manager.option("-e", "--email", dest="email")
+@manager.option("-ne", "--new_email", dest="new_email")
+def change_secret(email, new_email):
+    user = CMSUser.query.filter_by(email=email).first()
+    user.password = new_email
+    db.session.commit()
+    print("邮箱修改成功")
 
 
 @manager.option("-t", "--title", dest="title")

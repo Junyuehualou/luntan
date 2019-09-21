@@ -17,6 +17,13 @@ class ChangeSecret(BaseForm):
 
     submit = SubmitField()
 
+class ChangEmail(BaseForm):
+    old_email = StringField(validators=[Email(message="请输入正确格式的邮箱")])
+    new_email = StringField(validators=[Email(message="请输入正确格式的邮箱")])
+    email_repeat = StringField(validators=[Email(message="请输入正确格式的邮箱"),
+                                              EqualTo("new_email", message="两次输入的邮箱不一致")])
+
+    submit = SubmitField()
 
 class NewsWrite(BaseForm):
     title = StringField(validators=[InputRequired(message="新闻标题不能为空")])

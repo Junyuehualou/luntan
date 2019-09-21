@@ -1,0 +1,41 @@
+{% extends 'cms/base.html' %}
+
+
+{% block page_title %}
+邮箱修改
+{% endblock %}
+
+{% block main_content %}
+
+    <form action="" method="post">
+        <table class="table table-bordered user_info" >
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <tr>
+                <td>原邮箱</td>
+                <td><input type="text" name="old_email"></td>
+            </tr>
+            <tr>
+                <td>新邮箱</td>
+                <td><input type="text" name="new_email"></td>
+            </tr>
+                <tr>
+                    <td>重复输入</td>
+                    <td><input type="text" name="email_repeat"></td>
+                </tr>
+            <tr>{% for i in get_flashed_messages() %}
+                <td><p style="color: red">{{ i }}</p></td>
+                {% endfor %}
+
+                <td><input type="submit" value="提交更改" name="submit"></td>
+
+            </tr>
+        </table>
+    </form>
+{% endblock %}
+
+
+
+
+
+
+
