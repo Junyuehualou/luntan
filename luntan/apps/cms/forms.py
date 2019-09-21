@@ -30,3 +30,4 @@ class Register(BaseForm):
     username = StringField(validators=[InputRequired(message="用户名是必填字段")])
     email = StringField(validators=[Email(message="请输入正确的邮箱类型"), InputRequired(message="请输入邮箱")])
     password = StringField(validators=[Length(min=6, max=20, message="请输入正确格式的密码")])
+

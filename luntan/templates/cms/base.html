@@ -43,16 +43,16 @@
               <ul class="nav-sidebar">
                 <li class="unfold"><a href="#">首页</a></li>
                 <li class="profile-li">
-                    <a href="{{ url_for('cms.profile') }}">个人中心<span></span></a>
+                    <a href="#">个人中心<span></span></a>
                     <ul class="subnav">
-                        <li><a href="#">个人信息</a></li>
+                        <li><a href="{{ url_for('cms.profile') }}">个人信息</a></li>
                         <li><a href="{{ url_for('cms.change') }}">修改密码</a></li>
                         <li><a href="#">修改邮箱</a></li>
                     </ul>
                 </li>
 
                 <li class="nav-group post-manage"><a href="{{ url_for('cms.load_news') }}">热点新闻</a></li>
-                <li class="comments-manage"><a href="#">评论管理</a></li>
+                <li class="comments-manage"><a href="{{ url_for('cms.control_news') }}">新闻管理</a></li>
                 <li class="board-manage"><a href="{{ url_for('cms.write_news') }}">新闻撰写</a></li>
 
                 <li class="nav-group user-manage"><a href="#">用户管理</a></li>

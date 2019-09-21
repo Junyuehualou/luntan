@@ -73,7 +73,8 @@ def register():
             user = CMSUser(username=username, email=email, password=password)
             db.session.add(user)
             db.session.commit()
-        return render_template('cms/cms_login.html', register_info="<script>alert('注册成功')</script>")
+        # return render_template('cms/cms_login.html', register_info="<script>alert('注册成功')</script>")
+        return redirect(url_for('cms.login'))
     else:
         return render_template('cms/cms_register.html')
 
@@ -136,9 +137,8 @@ def write_news():
             return render_template("front/news_editor.html", message=message)
 
 
-# 将数据从数据库查出来，渲染到页面    每次加载新闻页
-@bp.route('/load_news/', endpoint="load_news")
-def load_news():
+# 查询所有新闻信息
+def search_news():
     all_news = News.query.order_by(News.id.desc()).all()
     news_list = []
     for new in all_news:
@@ -151,7 +151,14 @@ def load_news():
         news_info["send_time"] = new.send_time
         news_info["digest"] = new.digest
         news_list.append(news_info)
-    # print(news_list)
+    return news_list
+
+
+
+# 将数据从数据库查出来，渲染到页面    每次加载新闻页
+@bp.route('/load_news/', endpoint="load_news")
+def load_news():
+    news_list = search_news()
     return render_template("front/front_index.html", news_list=news_list)
 
 
@@ -161,3 +168,13 @@ def news_detail(new_id):
     new_info = News.query.filter_by(id=new_id).first()
     print(new_info.content)
     return render_template("front/front_detail.html", new_info=new_info)
+
+
+# 管理所有提交的新闻列表
+@bp.route('/control_news/', methods=["POST", "GET"], endpoint="control_news")
+def control_news():
+    if request.method == "GET":
+        news_list = search_news()
+        return render_template('front/front_news_list.html', news_list=news_list)
+    else:
+        pass

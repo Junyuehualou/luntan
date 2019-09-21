@@ -14,14 +14,6 @@ def index():
     return redirect(url_for("cms.load_news") )
 
 
-# # 新闻详情页
-# @bp.route('/detail/<int:page>/')
-# def detail(page):
-#     news = News.query.filter_by(id=page).first()
-#     if news:
-#         return render_template('front/front_detail.html', news=news)
-#     else:
-#         return render_template('front/404.html')
 
 
 
