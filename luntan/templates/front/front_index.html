@@ -32,7 +32,7 @@
         <li>
             <a href="#" class="news_pic fl"><img src="{{ url_for('static', filename='front/images/news_pic.jpg') }}"></a>
             <a href="{{ url_for('cms.news_detail' ,new_id=new.id  ) }}" class="news_title fl">{{ new.title }}</a>
-            <a href="#" class="news_detail fl">{{ new.digest }}</a>
+            <a href="#" class="news_detail fl">{{ new.digest|truncate(length=100) }}</a>
             <div class="author_info fl">
                 <div class="source fl">
                     来源：{{ new.source }}

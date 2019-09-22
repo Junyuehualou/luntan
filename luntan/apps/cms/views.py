@@ -1,12 +1,11 @@
-from flask import Blueprint, render_template, views, request, session, redirect, url_for, g, flash, Response
+from flask import Blueprint, render_template, views, request, session, redirect, url_for, g, flash, Response, jsonify
 from .forms import LoginForm, ChangeSecret, NewsWrite, Register
 from .models import CMSUser
-from ..front.models import News
+from ..front.models import News, Comment
 import config
 from .decorators import login_required
 from exts import db
-from datetime import datetime
-import time
+import json
 
 
 bp = Blueprint('cms', __name__, url_prefix="/cms")
@@ -127,7 +126,7 @@ def write_news():
             category_id = form.category_id.data
             digest = form.digest.data
             content = form.content.data
-            new = News(title=title, content=content, author="Junyue", digest=digest, source="东湖日报")
+            new = News(title=title, content=content, author=g.cms_user.username, digest=digest, source="东湖日报")
             db.session.add(new)
             db.session.commit()
             message = "<script>alert('新闻提交成功')</script>"
@@ -154,7 +153,6 @@ def search_news():
     return news_list
 
 
-
 # 将数据从数据库查出来，渲染到页面    每次加载新闻页
 @bp.route('/load_news/', endpoint="load_news")
 def load_news():
@@ -166,15 +164,86 @@ def load_news():
 @bp.route("/news_detail/<new_id>/")
 def news_detail(new_id):
     new_info = News.query.filter_by(id=new_id).first()
-    print(new_info.content)
+    # print(new_info.content)
     return render_template("front/front_detail.html", new_info=new_info)
 
 
+
 # 管理所有提交的新闻列表
-@bp.route('/control_news/', methods=["POST", "GET"], endpoint="control_news")
+@bp.route('/control_news/', endpoint="control_news")
 def control_news():
+    news_list = search_news()[::-1]
+    return render_template('front/front_news_list.html', news_list=news_list)
+
+
+# 删除新闻列表中的新闻
+@bp.route('/delete_new/<int:new_id>/', endpoint="delete_new")
+def delete_new(new_id):
+    new = News.query.filter_by(id=new_id).first()
+    db.session.delete(new)
+    db.session.commit()
+    return redirect(url_for('cms.control_news'))
+
+
+#  编辑新闻列表中的新闻
+@bp.route('/edit_new/<int:new_id>/', endpoint="edit_new", methods=["POST", "GET"])
+@login_required
+def edit_new(new_id):
     if request.method == "GET":
-        news_list = search_news()
-        return render_template('front/front_news_list.html', news_list=news_list)
+        new = News.query.filter_by(id=new_id).first()
+        return render_template('front/front_edit_new.html', new=new)
     else:
-        pass
+        form = NewsWrite(request.form)
+        if form.validate():
+            title = form.title.data
+            digest = form.digest.data
+            content = form.content.data
+            print(g.cms_user.username)
+            author = g.cms_user.username
+            News.query.filter_by(id=new_id).update({
+                "title": title,
+                "digest": digest,
+                "content": content,
+                "author": author
+            })
+            db.session.commit()
+            message = "<script>alert('新闻编辑成功')</script>"
+            return render_template("front/news_editor.html", message=message)
+        else:
+            message = "<script>alert('新闻内容填写不完整，提交失败')</script>"
+            return render_template("front/news_editor.html", message=message)
+
+
+# # 将前台提交的数据存储到数据库
+# # @bp.route('/comment/', methods=["POST", "GET"], endpoint='comment')
+# # def comment():
+# #     if request.method == "POST":
+# #         form = CommentList(request.form)
+# #         if form.validate():
+# #             comment_input = form.comment_input.data
+# #             new_id = form.new_id.data
+# #             comment = Comment(comment=comment_input, author=g.cms_user.username)
+# #             db.session.add(comment)
+# #             db.session.commit()
+# #             # return redirect(url_for('cms.news_detail', id=new_id))
+# #             return "ok"
+# #         else:
+# #             return render_template('front/404.html')
+# #     else:
+# #         return "shibai"
+
+
+# 将前台提交的数据存储到数据库
+@bp.route('/comment/', methods=["POST", "GET"], endpoint='comment')
+def comment():
+
+    # user_comment = request.form.get('user_comment')
+    # comment = Comment(comment=user_comment, author=g.cms_user.username)
+    # db.session.add(comment)
+    # db.session.commit()
+    data = {
+        "user_comment": "haode"
+    }
+    return json.dumps(data)
+    # return redirect(url_for('cms.load_news', data=data))
+

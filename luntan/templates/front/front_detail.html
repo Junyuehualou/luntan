@@ -4,11 +4,12 @@
     文章详情页
 {% endblock %}
 
+    {% block script %}
+{#        <link rel="stylesheet" href="{{ url_for('static', filename='front/js/news_detail.js') }}">#}
+{#        <link rel="stylesheet" href="{{ url_for('static', filename='front/js/jquery-1.12.4.min.js') }}">#}
+        <link rel="stylesheet" href="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js">
 
-{% block script %}
-    <script type="text/javascript" src="{{ url_for('static', filename='front/js/detail.js') }}"></script>
-{% endblock %}
-
+    {% endblock %}
 
 {% block content %}
     <div class="detail_con fl" style="width: 1000px">
@@ -20,23 +21,81 @@
         {{ new_info.content | safe }}
     </div>
 
-    <div><input type="text"></div>
+    <div><input type="text" style="width: 1000px;" disabled='disabled'></div>
 
 
+    <form action="" class="comment_form" method="post">
+         <div class="person_pic">
+             <img src="{{ url_for('static', filename='front/images/user_pic.png') }}" alt="用户图标">
+         </div>
 
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
+        <div>
+            <textarea placeholder="登录后，发表您的评论" class="comment_input" name="comment_input"></textarea>
+            <input type="submit" id="comment_submit" value="评 论" class="sub comment_sub" style="float: none;margin-left: 30px">
+        </div>
 
-    <form action="" class="comment_form" >
+            <input type="hidden" name="new_id" value="{{ new_info.id }}"></input>
+    </form>
+
+    <br>
+    <p>------------------------------------------------------------------------------------------------------------------------------------------------------</p>
+
          <div class="person_pic">
              <img src="{{ url_for('static', filename='front/images/cat.jpg') }}" alt="用户图标">
          </div>
-
+{#{{ data.data.user_comment }}#}
         <div>
-            <textarea placeholder="请发表您的评论" class="comment_input"></textarea>
-            <input type="submit" name="" value="评 论" class="comment_sub">
+            <textarea placeholder="用户的评论" id="user_comment"></textarea>
         </div>
-    </form>
 
+
+     {% set csrf_token = csrf_token() %}
+
+
+
+    <script>
+
+        {#    // 入口函数#}
+        $(function () {
+        {#    // 评论提交#}
+            $("#comment_submit").click(function (event) {
+        {#    //阻止默认触发事件#}
+                event.preventDefault();
+                user_comment = $(".comment_input").val();
+
+        {#        // 判断是否有内容#}
+                if (!user_comment) {
+                    alert('请输入评论内容');
+                    return
+                }
+                        alert("ok");
+
+                $.ajax({
+                    url:'/cms/comment/',
+                    type: "post",
+                    dateType: "application/json",
+                     headers: {
+                         "csrf_token": csrf_token
+                     },
+                    data: {
+                        "user_comment": user_comment,
+                    },
+                    success:function (data) {
+                        alert("oneday");
+                        console.log(data);
+                        $("#user_comment").val(data);
+                    }
+
+
+                })
+
+            })
+
+
+        });
+</script>
 
 
 {% endblock %}

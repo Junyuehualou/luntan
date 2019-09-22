@@ -9,11 +9,17 @@
     <script src="http://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="{{ static('cms/css/cms_base.css')}}">
     <script src="{{ static('cms/js/cms_base.js') }}"></script>
+
 </head>
-<body>
+<body style="overflow-y:scroll;">
 
-
-    <table class="table table-condensed">
+<div style="width: 1200px;margin-left: 150px">
+    <div>
+        <h3 style="text-align: center">新闻管理详情</h3>
+        <a href="{{ url_for('cms.profile') }}" style="float: right;color: orangered">返回首页</a>
+    </div>
+<form action="" method="post">
+    <table class="table table-striped">
         <tr style="background: skyblue">
             <th >新闻ID</th>
             <th>新闻标题</th>
@@ -23,24 +29,24 @@
             <th></th>
             <th></th>
         </tr>
+    {% for new in news_list %}
+        <tr>
+            <td>{{ new.id }}</td>
+            <td>{{ new.title }}</td>
+            <td>{{ new.author }}</td>
+            <td>{{ new.send_time }}</td>
+            <td>{{ new.source }}</td>
+            <td><a href="{{ url_for('cms.edit_new', new_id=new.id ) }}" class="">编辑新闻</a></td>
+            <td><a href="{{ url_for('cms.delete_new', new_id=new.id ) }}" class="delete_new">删除新闻</a></td>
+        </tr>
+    {% endfor %}
 
-        <form action="" method="post">
-            {% for new in news_list %}
-                <tr>
-                    <td>{{ new.id }}</td>
-                    <td>{{ new.title }}</td>
-                    <td>{{ new.author }}</td>
-                    <td>{{ new.send_time }}</td>
-                    <td>{{ new.source }}</td>
-                    <td><a href="#" class="">编辑新闻</a></td>
-                    <td><a href="{{ url_for('cms.delete_new', id = new.id ) }}" class="delete_new">删除新闻</a></td>
-                </tr>
-            {% endfor %}
-
-         </form>
 
     </table>
 
+</form>
+
+</div>
 
 </body>
 </html>
