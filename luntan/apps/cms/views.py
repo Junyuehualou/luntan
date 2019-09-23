@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, views, request, session, redirect, url_for, g, flash, Response, jsonify
-from .forms import LoginForm, ChangeSecret, NewsWrite, Register
+from .forms import LoginForm, ChangeSecret, NewsWrite, Register, CommentList
 from .models import CMSUser
 from ..front.models import News, Comment
 import config
@@ -161,11 +161,21 @@ def load_news():
 
 
 # 跳转到详情页
-@bp.route("/news_detail/<new_id>/")
+@bp.route("/news_detail/<new_id>/", methods=["POST", "GET"])
 def news_detail(new_id):
     new_info = News.query.filter_by(id=new_id).first()
+    comments = Comment.query.filter_by(new_id=new_id).all()
+    print(comments)
+    comment_list = []
+    for comment in comments:
+        comment_info = {}
+        comment_info['comment'] = comment.comment
+        comment_info['author'] = comment.author
+        comment_info['comment_time'] = comment.comment_time
+        comment_list.append(comment_info)
+
     # print(new_info.content)
-    return render_template("front/front_detail.html", new_info=new_info)
+    return render_template("front/front_detail.html", new_info=new_info, comment_list=comment_list)
 
 
 
@@ -214,36 +224,25 @@ def edit_new(new_id):
             return render_template("front/news_editor.html", message=message)
 
 
-# # 将前台提交的数据存储到数据库
-# # @bp.route('/comment/', methods=["POST", "GET"], endpoint='comment')
-# # def comment():
-# #     if request.method == "POST":
-# #         form = CommentList(request.form)
-# #         if form.validate():
-# #             comment_input = form.comment_input.data
-# #             new_id = form.new_id.data
-# #             comment = Comment(comment=comment_input, author=g.cms_user.username)
-# #             db.session.add(comment)
-# #             db.session.commit()
-# #             # return redirect(url_for('cms.news_detail', id=new_id))
-# #             return "ok"
-# #         else:
-# #             return render_template('front/404.html')
-# #     else:
-# #         return "shibai"
 
 
-# 将前台提交的数据存储到数据库
+# 将前台提交的评论存储到数据库
 @bp.route('/comment/', methods=["POST", "GET"], endpoint='comment')
+@login_required
 def comment():
-
-    # user_comment = request.form.get('user_comment')
-    # comment = Comment(comment=user_comment, author=g.cms_user.username)
-    # db.session.add(comment)
-    # db.session.commit()
-    data = {
-        "user_comment": "haode"
-    }
-    return json.dumps(data)
+    if request.method == "POST":
+        user_comment = request.form.get('user_comment')
+        new_id = request.form.get("new_id")
+        print(user_comment)
+        comment = Comment(comment=user_comment, author=g.cms_user.username, new_id=new_id)
+        db.session.add(comment)
+        db.session.commit()
+        return jsonify({"data": user_comment})
+    else:
+        data = {
+            "user_comment": "ok"
+        }
+        print("GET")
+        return jsonify(data)
     # return redirect(url_for('cms.load_news', data=data))
 

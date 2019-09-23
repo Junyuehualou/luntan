@@ -1,35 +1,37 @@
-// 入口函数
-
-$(function () {
-    // 评论提交
-    $("#comment_submit").click(function (event) {
-        event.preventDefault();     //阻止默认触发事件
-        user_comment = $(".comment_input").val();
-        console.log(user_comment);
-        // 判断是否有内容
-        if (!user_comment) {
-            alert('请输入评论内容');
-            return
-        }
-
-        $.ajax({
-            url:'/cms/comment',
-            type: "post",
-            contentType: "application/json",
-            // headers: {
-            //     "X-CSRFToken": getCookie("csrf_token")
-            // },
-            data: JSON.stringify({
-                "user_comment": user_comment,
-            }),
-            success:function (data) {
-                console.log(data)
-            }
 
 
-        })
+        $(function () {
 
-    })
+            $("#comment_submit").click(function (event) {
+                event.preventDefault();
+                user_comment = $("#comment_input").val();
+                    console.log(user_comment);
+                    new_id = $("#new_id").val();
+                if (!user_comment) {
+                    alert('请输入评论内容');
+                    return
+                }
 
 
-});
+                $.ajax({
+                    url: "/cms/comment/",
+                    type: "post",
+                    dataType: "json",
+                    data: {
+                        'user_comment': user_comment,
+                        'new_id':new_id,
+                    },
+                    success:function (data) {
+                        alert("评论成功");
+                        console.log(data.data);
+                        $("#comment_input").val("");
+                        $("#user_comment").val(data.data)
+
+                    }
+                });
+
+
+            })
+
+
+        });

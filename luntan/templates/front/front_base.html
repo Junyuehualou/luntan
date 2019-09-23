@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}{% endblock %}</title>
+    <link href="http://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='front/css/reset.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='front/css/main.css') }}">
-    <script type="text/javascript" src="{{ url_for('static', filename='front/js/jquery-1.12.4.min.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='front/js/main.js') }}"></script>
+{#    <script type="text/javascript" src="{{ url_for('static', filename='front/js/jquery-1.12.4.min.js') }}"></script>#}
+{#    <script type="text/javascript" src="{{ url_for('static', filename='front/js/main.js') }}"></script>#}
     {% block script %}{% endblock %}
 </head>
 <body>
@@ -14,19 +15,6 @@
     {% block content %}{% endblock %}
     {% block rigtht %}
 
-{#        <div class="rank_con fr">#}
-{#            {% block userBlock %}{% endblock %}#}
-{#            <div class="rank_title">#}
-{#                <h3>点击排行</h3>#}
-{#            </div>#}
-{#            <ul class="rank_list">#}
-{##}
-{#                    <li><span class=""></span>#}
-{##}
-{#                    </li>#}
-{##}
-{#            </ul>#}
-{#        </div>#}
 
     {% endblock %}
     {% block user_comment %}

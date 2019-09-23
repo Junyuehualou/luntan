@@ -19,3 +19,5 @@ class Comment(db.Model):
     comment = db.Column(db.Text, nullable=False)
     author = db.Column(db.String(50))
     comment_time = db.Column(db.DateTime, default=datetime.now)
+    new_id = db.Column(db.Integer, db.ForeignKey("news.id"))
+    new = db.relationship("News", backref="comments")

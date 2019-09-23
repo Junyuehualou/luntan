@@ -32,8 +32,7 @@ class Register(BaseForm):
     password = StringField(validators=[Length(min=6, max=20, message="请输入正确格式的密码")])
 
 
-# class CommentList(BaseForm):
-#     comment_input = TextAreaField(validators=[InputRequired(message="评论不能为空")])
-#     submit = SubmitField()
-#     new_id = IntegerField()
-#
+class CommentList(BaseForm):
+    comment_input = TextAreaField(validators=[InputRequired(message="评论不能为空")])
+    submit = SubmitField()
+    new_id = IntegerField()
