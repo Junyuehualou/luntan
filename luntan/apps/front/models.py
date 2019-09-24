@@ -11,6 +11,7 @@ class News(db.Model):
     source = db.Column(db.String(100))
     send_time = db.Column(db.DateTime, default=datetime.now)
     digest = db.Column(db.Text, nullable=False)
+    status = db.Column(db.Integer, nullable=False, default=1)
 
 
 class Comment(db.Model):

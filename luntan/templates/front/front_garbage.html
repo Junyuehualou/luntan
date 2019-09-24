@@ -15,10 +15,10 @@
 
 <div style="width: 1200px;margin-left: 150px">
     <div>
-        <h3 style="text-align: center">新闻管理详情</h3>
-        <a href="{{ url_for('cms.profile') }}" style="float: right;color: orangered">返回首页</a>
+        <h3 style="text-align: center">垃圾站</h3>
+        <a href="{{ url_for('cms.control_news') }}" style="float: right;color: orangered">返回新闻管理页</a>
         <br>
-        <a href="{{ url_for('cms.garbage') }}" style="float: right;color: orangered">垃圾站</a>
+        <a href="{{ url_for('cms.profile') }}" style="float: right;color: orangered">返回首页</a>
     </div>
 <form action="" method="post">
     <table class="table table-striped">
@@ -29,8 +29,8 @@
             <th>新闻发表时间</th>
             <th>新闻来源</th>
             <th></th>
-            <th></th>
         </tr>
+
     {% for new in news_list %}
         <tr>
             <td>{{ new.id }}</td>
@@ -38,9 +38,9 @@
             <td>{{ new.author }}</td>
             <td>{{ new.send_time }}</td>
             <td>{{ new.source }}</td>
-            <td><a href="{{ url_for('cms.edit_new', new_id=new.id ) }}" class="">编辑新闻</a></td>
-            <td><a href="{{ url_for('cms.delete_new', new_id=new.id ) }}" class="delete_new">删除新闻</a></td>
+            <td><a href="{{ url_for('cms.restore_new', new_id=new.id ) }}" class="">还原新闻</a></td>
         </tr>
+
     {% endfor %}
 
 

@@ -137,8 +137,8 @@ def write_news():
 
 
 # 查询所有新闻信息
-def search_news():
-    all_news = News.query.order_by(News.id.desc()).all()
+def search_news(status_code):
+    all_news = News.query.filter_by(status=status_code).all()
     news_list = []
     for new in all_news:
         news_info = {}
@@ -150,13 +150,14 @@ def search_news():
         news_info["send_time"] = new.send_time
         news_info["digest"] = new.digest
         news_list.append(news_info)
+    news_list = news_list[::-1]
     return news_list
 
 
 # 将数据从数据库查出来，渲染到页面    每次加载新闻页
 @bp.route('/load_news/', endpoint="load_news")
 def load_news():
-    news_list = search_news()
+    news_list = search_news(status_code=1)
     return render_template("front/front_index.html", news_list=news_list)
 
 
@@ -173,7 +174,6 @@ def news_detail(new_id):
         comment_info['author'] = comment.author
         comment_info['comment_time'] = comment.comment_time
         comment_list.append(comment_info)
-
     # print(new_info.content)
     return render_template("front/front_detail.html", new_info=new_info, comment_list=comment_list)
 
@@ -182,15 +182,14 @@ def news_detail(new_id):
 # 管理所有提交的新闻列表
 @bp.route('/control_news/', endpoint="control_news")
 def control_news():
-    news_list = search_news()[::-1]
+    news_list = search_news(status_code=1)[::-1]
     return render_template('front/front_news_list.html', news_list=news_list)
 
 
 # 删除新闻列表中的新闻
 @bp.route('/delete_new/<int:new_id>/', endpoint="delete_new")
 def delete_new(new_id):
-    new = News.query.filter_by(id=new_id).first()
-    db.session.delete(new)
+    News.query.filter_by(id=new_id).update({"status": 0})
     db.session.commit()
     return redirect(url_for('cms.control_news'))
 
@@ -224,6 +223,19 @@ def edit_new(new_id):
             return render_template("front/news_editor.html", message=message)
 
 
+# 垃圾回收站
+@bp.route('/garbage/')
+def garbage():
+    news_list = search_news(status_code=0)[::-1]
+    return render_template('front/front_garbage.html', news_list=news_list)
+
+
+# 从垃圾回收站还原新闻
+@bp.route('/restore_new/<int:new_id>/', endpoint="restore_new")
+def restore_new(new_id):
+    News.query.filter_by(id=new_id).update({"status": 1})
+    db.session.commit()
+    return redirect(url_for('cms.garbage'))
 
 
 # 将前台提交的评论存储到数据库
@@ -246,3 +258,12 @@ def comment():
         return jsonify(data)
     # return redirect(url_for('cms.load_news', data=data))
 
+
+# 添加测试数据
+@bp.route("/test/")
+def test():
+    for i in range(100):
+        new = News(title='title %s' % i, digest='digest %s' % i, content='content %s' % i)
+        db.session.add(new)
+        db.session.commit()
+    return Response("OK")
