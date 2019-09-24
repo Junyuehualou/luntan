@@ -36,3 +36,11 @@ class CommentList(BaseForm):
     comment_input = TextAreaField(validators=[InputRequired(message="评论不能为空")])
     submit = SubmitField()
     new_id = IntegerField()
+
+
+class ChangeXinxi(BaseForm):
+    old_username = StringField(validators=[Length(min=6, max=20, message="请输入正确格式的用户名")])
+    new_username = StringField(validators=[Length(min=6, max=20, message="请输入正确格式的用户名")])
+    username_repeat = StringField(validators=[Length(min=6, max=20, message="请输入正确格式的用户名"),
+                                              EqualTo("new_username", message="两次输入的用户名不一致")])
+    submit = SubmitField()

@@ -1,11 +1,11 @@
 from flask import Blueprint, render_template, views, request, session, redirect, url_for, g, flash, Response, jsonify
-from .forms import LoginForm, ChangeSecret, NewsWrite, Register, CommentList
+from .forms import LoginForm, ChangeSecret, NewsWrite, Register, CommentList, ChangeXinxi
 from .models import CMSUser
 from ..front.models import News, Comment
 import config
 from .decorators import login_required
 from exts import db
-import json
+from flask_paginate import Pagination, get_page_parameter
 
 
 bp = Blueprint('cms', __name__, url_prefix="/cms")
@@ -157,8 +157,20 @@ def search_news(status_code):
 # 将数据从数据库查出来，渲染到页面    每次加载新闻页
 @bp.route('/load_news/', endpoint="load_news")
 def load_news():
-    news_list = search_news(status_code=1)
-    return render_template("front/front_index.html", news_list=news_list)
+    page = request.args.get(get_page_parameter(), type=int, default=1)
+    start = (page - 1) * config.PER_PAGE
+    end = start + config.PER_PAGE
+    query_obj = News.query.filter_by(status=1).all()
+    query_obj = query_obj[::-1]
+    new_total = len(query_obj)
+    print(new_total)
+    news = query_obj[start:end]
+    pagination = Pagination(bs_version=3, page=page, total=new_total, inner_window=2, outer_window=0)
+    context = {
+        'pagination': pagination,
+        'news': news
+    }
+    return render_template("front/front_index.html", **context)
 
 
 # 跳转到详情页
@@ -267,3 +279,38 @@ def test():
         db.session.add(new)
         db.session.commit()
     return Response("OK")
+
+
+
+
+
+
+
+
+
+
+
+
+class ChangeXinXi(views.MethodView):
+    def get(self):
+        return render_template('cms/cms_change_xinxi.html')
+    def post(self):
+        form=ChangeXinxi(request.form)
+        print("form")
+        if form.validate():
+            old_username=form.old_username.data
+            username_repeat=form.username_repeat.data
+            user=CMSUser.query.filter_by(username=old_username).first()
+            print("user")
+            if user:
+                user.username=username_repeat
+                db.session.commit()
+                flash("用户名修改成功，请重新登录")
+                return redirect(url_for('cms.profile'))
+            else:
+                flash("修改用户名失败,重新输入")
+                return redirect(url_for('cms.change_xinxi'))
+        else:
+            flash("修改用户名失败")
+            return redirect(url_for('cms.change_xinxi'))
+bp.add_url_rule('/change_xinxi/',view_func=ChangeXinXi.as_view('change_xinxi'))
