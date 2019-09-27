@@ -53,23 +53,17 @@
     <br>
     <p>------------------------------------------------------------------------------------------------------------------------------------------------------</p>
 
-    <form action="" class="comment_form" >
-
-         <div class="person_pic">
-             <img src="{{ url_for('static', filename='front/images/cat.jpg') }}" alt="用户图标">
-         </div>
-
-        <div>
-            <textarea placeholder="用户的评论" id="user_comment" style="width: 600px;height: 50px"></textarea>
-        </div>
-
-    </form>
-
    {% for comment in comment_list %}
 <form action="" class="comment_form" >
         <div class="person_pic">
              <img src="{{ url_for('static', filename='front/images/cat.jpg') }}" alt="用户图标">
+
         </div>
+
+        <div>
+            <p style="color: crimson">{{ comment.author }}</p>
+        </div>
+
         <div>
             <textarea placeholder="用户的评论" id="user_comment" disabled="disabled" style="width: 600px;height: 50px">{{ comment.comment }}</textarea>
         </div>

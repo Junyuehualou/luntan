@@ -23,9 +23,8 @@
                     },
                     success:function (data) {
                         alert("评论成功");
-                        console.log(data.data);
                         $("#comment_input").val("");
-                        $("#user_comment").val(data.data)
+                        location.reload()
 
                     }
                 });

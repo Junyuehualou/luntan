@@ -23,6 +23,7 @@
                 </div>
                 <div class="time fl">2017-01-01 00:00:00</div>
             </div>
+
         </li>
 
 
@@ -31,7 +32,14 @@
             <form action="" method="post">
 
         <li>
-            <a href="#" class="news_pic fl"><img src="{{ url_for('static', filename='front/images/news_pic.jpg') }}"></a>
+        {% if new.category_id == 0 %}
+            <a href="javascript:void(0)" class="news_pic fl"><img src="{{ url_for('static', filename='front/images/news_pic.jpg') }}"></a>
+                {% elif new.category_id == 1 %}
+            <a href="javascript:void(0)" class="news_pic fl"><img src="{{ url_for('static', filename='front/images/tiyu.jpg') }}"></a>
+                {% else %}
+            <a href="javascript:void(0)" class="news_pic fl"><img src="{{ url_for('static', filename='front/images/timg.jpg') }}"></a>
+            {% endif %}
+
             <a href="{{ url_for('cms.news_detail' ,new_id=new.id  ) }}" class="news_title fl">{{ new.title }}</a>
             <a href="#" class="news_detail fl">{{ new.digest|truncate(length=100) }}</a>
             <div class="author_info fl">
@@ -39,8 +47,10 @@
                     来源：{{ new.source }}
                 </div>
                 <div class="time fl">{{ new.send_time }}</div>
-
             </div>
+
+
+
         </li>
             </form>
         {% endfor %}

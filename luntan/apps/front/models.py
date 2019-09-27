@@ -12,6 +12,7 @@ class News(db.Model):
     send_time = db.Column(db.DateTime, default=datetime.now)
     digest = db.Column(db.Text, nullable=False)
     status = db.Column(db.Integer, nullable=False, default=1)
+    category_id = db.Column(db.Integer, default=0)
 
 
 class Comment(db.Model):

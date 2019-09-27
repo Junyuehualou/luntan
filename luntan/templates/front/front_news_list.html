@@ -26,20 +26,31 @@
             <th >新闻ID</th>
             <th>新闻标题</th>
             <th>新闻作者</th>
+            <th>新闻分类</th>
             <th>新闻发表时间</th>
             <th>新闻来源</th>
             <th></th>
             <th></th>
         </tr>
-    {% for new in news_list %}
+
+        {% for new in news[::-1] %}
+
         <tr>
             <td>{{ new.id }}</td>
             <td>{{ new.title }}</td>
             <td>{{ new.author }}</td>
+
+            {% if new.category_id == 0 %}
+                <td>财经新闻</td>
+           {% elif new.category_id == 1 %}
+                <td>体育新闻</td>
+            {% else %}
+                <td>娱乐新闻</td>{% endif %}
             <td>{{ new.send_time }}</td>
             <td>{{ new.source }}</td>
             <td><a href="{{ url_for('cms.edit_new', new_id=new.id ) }}" class="">编辑新闻</a></td>
             <td><a href="{{ url_for('cms.delete_new', new_id=new.id ) }}" class="delete_new">删除新闻</a></td>
+
         </tr>
     {% endfor %}
 
@@ -49,6 +60,12 @@
 </form>
 
 </div>
+
+
+        <div style="text-align: center">
+                {{ pagination.links }}
+        </div>
+
 
 </body>
 </html>

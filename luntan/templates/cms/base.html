@@ -27,8 +27,17 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">
-            <li><a href="#"><span>[欢迎你]</span>{{ g.cms_user.username }}</a></li>
+            <li><a href="#"><span>[欢迎你]</span>
+            {% if g.cms_user %}
+                {{ g.cms_user.username }}
+                </a></li>
             <li><a href="{{ url_for('cms.logout') }}">注销</a></li>
+                {% else %}
+                <span>游客</span>
+                </a></li>
+                <li><a href="{{ url_for('cms.login') }}">登录</a></li>
+            {% endif %}
+
           </ul>
           <form class="navbar-form navbar-right">
             <input type="text" class="form-control" placeholder="查找...">

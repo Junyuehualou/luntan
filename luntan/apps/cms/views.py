@@ -80,6 +80,8 @@ def register():
 
 # 更换密码
 class ChangeView(views.MethodView):
+    decorators = [login_required]
+
     def get(self):
         return render_template('cms/cms_change_secret.html')
 
@@ -126,7 +128,7 @@ def write_news():
             category_id = form.category_id.data
             digest = form.digest.data
             content = form.content.data
-            new = News(title=title, content=content, author=g.cms_user.username, digest=digest, source="东湖日报")
+            new = News(title=title, content=content, author=g.cms_user.username, digest=digest, source="东湖日报", category_id=category_id)
             db.session.add(new)
             db.session.commit()
             message = "<script>alert('新闻提交成功')</script>"
@@ -136,40 +138,33 @@ def write_news():
             return render_template("front/news_editor.html", message=message)
 
 
-# 查询所有新闻信息
+# 查询所有新闻信息(垃圾站)
 def search_news(status_code):
     all_news = News.query.filter_by(status=status_code).all()
-    news_list = []
-    for new in all_news:
-        news_info = {}
-        news_info["id"] = new.id
-        news_info["title"] = new.title
-        news_info["content"] = new.content
-        news_info["author"] = new.author
-        news_info["source"] = new.source
-        news_info["send_time"] = new.send_time
-        news_info["digest"] = new.digest
-        news_list.append(news_info)
-    news_list = news_list[::-1]
-    return news_list
+    return all_news
 
 
-# 将数据从数据库查出来，渲染到页面    每次加载新闻页
-@bp.route('/load_news/', endpoint="load_news")
-def load_news():
+# 查询所有新闻（分页显示）
+def query_news(step, status_code):
     page = request.args.get(get_page_parameter(), type=int, default=1)
-    start = (page - 1) * config.PER_PAGE
-    end = start + config.PER_PAGE
-    query_obj = News.query.filter_by(status=1).all()
+    start = (page - 1) * step
+    end = start + step
+    query_obj = News.query.filter_by(status=status_code).all()
     query_obj = query_obj[::-1]
     new_total = len(query_obj)
-    print(new_total)
     news = query_obj[start:end]
     pagination = Pagination(bs_version=3, page=page, total=new_total, inner_window=2, outer_window=0)
     context = {
         'pagination': pagination,
         'news': news
     }
+    return context
+
+
+# 将数据从数据库查出来，渲染到页面    每次加载新闻页
+@bp.route('/load_news/', endpoint="load_news")
+def load_news():
+    context = query_news(step=config.PER_PAGE, status_code=1)
     return render_template("front/front_index.html", **context)
 
 
@@ -178,7 +173,7 @@ def load_news():
 def news_detail(new_id):
     new_info = News.query.filter_by(id=new_id).first()
     comments = Comment.query.filter_by(new_id=new_id).all()
-    print(comments)
+    # print(comments)
     comment_list = []
     for comment in comments:
         comment_info = {}
@@ -187,15 +182,17 @@ def news_detail(new_id):
         comment_info['comment_time'] = comment.comment_time
         comment_list.append(comment_info)
     # print(new_info.content)
+    comment_list = comment_list[::-1]
     return render_template("front/front_detail.html", new_info=new_info, comment_list=comment_list)
-
 
 
 # 管理所有提交的新闻列表
 @bp.route('/control_news/', endpoint="control_news")
+@login_required
 def control_news():
-    news_list = search_news(status_code=1)[::-1]
-    return render_template('front/front_news_list.html', news_list=news_list)
+    # news_list = search_news(status_code=1)[::-1]
+    context = query_news(step=50, status_code=1)
+    return render_template('front/front_news_list.html', **context)
 
 
 # 删除新闻列表中的新闻
@@ -219,13 +216,15 @@ def edit_new(new_id):
             title = form.title.data
             digest = form.digest.data
             content = form.content.data
-            print(g.cms_user.username)
+            category_id = form.category_id.data
+            # print(g.cms_user.username)
             author = g.cms_user.username
             News.query.filter_by(id=new_id).update({
                 "title": title,
                 "digest": digest,
                 "content": content,
-                "author": author
+                "author": author,
+                "category_id": category_id
             })
             db.session.commit()
             message = "<script>alert('新闻编辑成功')</script>"
@@ -238,8 +237,8 @@ def edit_new(new_id):
 # 垃圾回收站
 @bp.route('/garbage/')
 def garbage():
-    news_list = search_news(status_code=0)[::-1]
-    return render_template('front/front_garbage.html', news_list=news_list)
+    all_news = search_news(status_code=0)
+    return render_template('front/front_garbage.html', all_news=all_news)
 
 
 # 从垃圾回收站还原新闻
@@ -290,8 +289,10 @@ def test():
 
 
 
-
+# 修改个人信息
 class ChangeXinXi(views.MethodView):
+    decorators = [login_required]
+
     def get(self):
         return render_template('cms/cms_change_xinxi.html')
     def post(self):
@@ -313,4 +314,6 @@ class ChangeXinXi(views.MethodView):
         else:
             flash("修改用户名失败")
             return redirect(url_for('cms.change_xinxi'))
+
+
 bp.add_url_rule('/change_xinxi/',view_func=ChangeXinXi.as_view('change_xinxi'))
