@@ -1,11 +1,14 @@
+# -*- coding: utf-8 -*-
 from flask import Blueprint, render_template, views, request, session, redirect, url_for, g, flash, Response, jsonify
-from .forms import LoginForm, ChangeSecret, NewsWrite, Register, CommentList, ChangeXinxi
+from .forms import LoginForm, ChangeSecret, NewsWrite, Register, ChangeXinxi, ResetPwdForm
 from .models import CMSUser
 from ..front.models import News, Comment
 import config
 from .decorators import login_required
 from exts import db
 from flask_paginate import Pagination, get_page_parameter
+from utils import aliyun_sms
+from utils import cache
 
 
 bp = Blueprint('cms', __name__, url_prefix="/cms")
@@ -105,7 +108,82 @@ class ChangeView(views.MethodView):
             return render_template('cms/cms_change_secret.html')
 
 
-bp.add_url_rule('/change/',view_func=ChangeView.as_view('change'))
+bp.add_url_rule('/change/', view_func=ChangeView.as_view('change'))
+
+
+# 电话号码验证
+@bp.route('/telephone_validate/', methods=["POST", "GET"])
+def telephone_validate():
+    if request.method == "GET":
+        return render_template('cms/cms_telephone_validate.html')
+    else:
+        email = request.form.get("email")
+        telephone = request.form.get("telephone")
+        print(telephone)
+        user = CMSUser.query.filter_by(email=email).first()
+        print(user)
+        if user:
+            string = aliyun_sms.random_number()
+            code_dict = {"code": string}
+            cache.set("validate_code", string)
+            aliyun_sms.aliyun_code(telephone, code_dict)
+            message = "验证码发送成功, 如果接收不到短信，请过60s后请求"
+            return jsonify({"message": message})
+        else:
+            message = "邮箱不存在"
+            return jsonify({"message": message})
+
+
+# 验证验证码
+@bp.route('/validate_code/', methods=["POST"])
+def validate_code():
+    email = request.form.get("email")
+    code = request.form.get("validate_code")
+    user = CMSUser.query.filter_by(email=email).first()
+    print(user)
+    if user and cache.get("validate_code") == code:
+        # print("ok")
+        return jsonify({"message": "验证成功"})
+    else:
+        return jsonify({"message": "验证码填写错误或者邮箱填写与之前不一致"})
+
+
+# 重置密码
+class ResetPwdView(views.MethodView):
+    def get(self):
+        return render_template('cms/cms_reset_secret.html')
+
+    def post(self):
+        form = ResetPwdForm(request.form)
+        if form.validate():
+            email = form.email.data
+            password_repeat = form.password_repeat.data
+            user = CMSUser.query.filter_by(email=email).first()
+            if user:
+                user.password = password_repeat
+                db.session.commit()
+                return redirect(url_for('cms.login'))
+            else:
+                message = "密码重置失败， 请重试"
+                return render_template('cms/cms_reset_secret.html', message=message)
+        else:
+            return render_template('front/404.html')
+
+
+bp.add_url_rule('/reset_secret/',view_func=ResetPwdView.as_view('reset_secret'))
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # 转到新闻版块

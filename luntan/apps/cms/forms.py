@@ -44,3 +44,11 @@ class ChangeXinxi(BaseForm):
     username_repeat = StringField(validators=[Length(min=6, max=20, message="请输入正确格式的用户名"),
                                               EqualTo("new_username", message="两次输入的用户名不一致")])
     submit = SubmitField()
+
+
+class ResetPwdForm(BaseForm):
+    email = StringField(validators=[Email(message="请输入正确的邮箱类型"), InputRequired(message="请输入邮箱")])
+    password = StringField(validators=[Length(min=6, max=20, message="请输入正确格式的密码")])
+    password_repeat = StringField(validators=[Length(min=6, max=20, message="请输入正确格式的密码"),
+                                              EqualTo("password", message="两次输入的密码不一致")])
+

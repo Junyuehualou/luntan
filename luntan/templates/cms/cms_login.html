@@ -1,7 +1,6 @@
-
 <!DOCTYPE html>
 <html lang="zh-CN">
-  <head>
+<head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -17,12 +16,12 @@
 
     <!-- Custom styles for this template -->
     <link href="{{ url_for('static',filename='cms/css/signin.css') }}" rel="stylesheet">
-  </head>
+</head>
 
-  <body>
+<body>
 
-    <div class="container">
-      <form class="form-signin" method="post">
+<div class="container">
+    <form class="form-signin" method="post">
         <h2 class="form-signin-heading">请登录</h2>
 
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -32,22 +31,23 @@
         <label for="inputPassword" class="sr-only">密码：</label>
         <input type="password" id="inputPassword" class="form-control" placeholder="密码" name="password" required>
         <div class="checkbox">
-          <label>
-            <input type="checkbox" value="1" name="remember">记住我
-          </label>
+            <label>
+                <input type="checkbox" value="1" name="remember">记住我
+                <a href="{{ url_for('cms.telephone_validate') }}" >忘记密码？点击找回</a>
+            </label>
         </div>
         <button class="btn btn-lg btn-primary btn-block" type="submit">立即登录</button>
-          <a href="{{ url_for('cms.register') }}" class="btn btn-lg btn-primary btn-block">注册</a>
-      </form>
-        {% if message %}
-            <p style="text-align: center;" class="text-danger">{{ message }}</p>
-        {% endif %}
+        <a href="{{ url_for('cms.register') }}" class="btn btn-lg btn-primary btn-block">注册</a>
+    </form>
+    {% if message %}
+        <p style="text-align: center;" class="text-danger">{{ message|safe }}</p>
+    {% endif %}
 
-{#    {% if register_info %}#}
-{#           {{ register_info|safe }}#}
-{#        {% endif %}#}
+    {#    {% if register_info %}#}
+    {#           {{ register_info|safe }}#}
+    {#        {% endif %}#}
 
 
-    </div> <!-- /container -->
-  </body>
+</div> <!-- /container -->
+</body>
 </html>
