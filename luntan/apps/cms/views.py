@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from flask import Blueprint, render_template, views, request, session, redirect, url_for, g, flash, Response, jsonify
-from .forms import LoginForm, ChangeSecret, NewsWrite, Register, ChangeXinxi, ResetPwdForm
+from .forms import LoginForm, ChangeSecret, NewsWrite, Register, ChangeXinxi, ResetPwdForm, ChangEmail
 from .models import CMSUser
 from ..front.models import News, Comment
 import config
@@ -173,19 +173,6 @@ class ResetPwdView(views.MethodView):
 bp.add_url_rule('/reset_secret/',view_func=ResetPwdView.as_view('reset_secret'))
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 # 转到新闻版块
 @bp.route('/news/', endpoint="news")
 @login_required
@@ -343,9 +330,8 @@ def comment():
         data = {
             "user_comment": "ok"
         }
-        print("GET")
         return jsonify(data)
-    # return redirect(url_for('cms.load_news', data=data))
+
 
 
 # 添加测试数据
@@ -395,3 +381,33 @@ class ChangeXinXi(views.MethodView):
 
 
 bp.add_url_rule('/change_xinxi/',view_func=ChangeXinXi.as_view('change_xinxi'))
+
+
+# 更改邮箱
+class ChangeEmail(views.MethodView):
+    decorators = [login_required]
+
+    def get(self):
+        return render_template('cms/cms_change_email.html')
+
+    def post(self):
+        print("开始")
+        form = ChangEmail(request.form)
+        if form.validate():
+            old_email = form.old_email.data
+            email_repeat = form.email_repeat.data
+            user = CMSUser.query.filter_by(email=old_email).first()
+            if user:
+                user.email = email_repeat
+                db.session.commit()
+                flash("邮箱更改成功， 请重新登录")
+                return redirect(url_for('cms.login'))
+            else:
+                flash("修改邮箱失败,重新输入")
+                return render_template('cms/cms_change_email.html')
+        else:
+            flash("修改邮箱失败")
+            return render_template('cms/cms_change_email.html')
+
+
+bp.add_url_rule('/change_email/',view_func=ChangeEmail.as_view('change_email'))

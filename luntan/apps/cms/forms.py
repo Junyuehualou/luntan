@@ -52,3 +52,11 @@ class ResetPwdForm(BaseForm):
     password_repeat = StringField(validators=[Length(min=6, max=20, message="请输入正确格式的密码"),
                                               EqualTo("password", message="两次输入的密码不一致")])
 
+
+class ChangEmail(BaseForm):
+    old_email = StringField(validators=[Email(message="请输入正确格式的邮箱")])
+    new_email = StringField(validators=[Email(message="请输入正确格式的邮箱")])
+    email_repeat = StringField(validators=[Email(message="请输入正确格式的邮箱"),
+                                              EqualTo("new_email", message="两次输入的邮箱不一致")])
+
+    submit = SubmitField()
